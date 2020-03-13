@@ -95,6 +95,8 @@ Si le mot de passe est mauvais (par exemple `tst` au lieu de `test`), la requêt
 }
 ```
 
+## Frameworks
+
 Une requête GraphQL peut s'exprimer via un simple `POST` dans tous les langages / framework. C'est le corps de la requête qui va contenir le code GraphQL. Exemples :
 
 #### NodeJS - Request
