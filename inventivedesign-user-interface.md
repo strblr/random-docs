@@ -37,6 +37,8 @@ type Mutation {
 }
 ```
 
+Tous les champs ne seront évidemment pas exploitables dans vos applications (`coworker`, `projectCount`, etc. sont spécifiques à Finder / Physisolve).
+
 ## Opération
 
 Pour exécuter une mutation (par exemple `signin`), GraphQL utilise la syntaxe suivante :
