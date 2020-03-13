@@ -105,7 +105,7 @@ Une requête GraphQL peut s'exprimer via un simple `POST` dans tous les langages
 var request = require('request');
 var options = {
   'method': 'POST',
-  'url': 'http://localhost:8084/finder/api',
+  'url': 'monUrl',
   'headers': {
     'Content-Type': 'application/json'
   },
@@ -137,7 +137,7 @@ request(options, function (error, response) {
 <?php
 require_once 'HTTP/Request2.php';
 $request = new HTTP_Request2();
-$request->setUrl('http://localhost:8084/finder/api');
+$request->setUrl('monUrl');
 $request->setMethod(HTTP_Request2::METHOD_POST);
 $request->setConfig(array(
   'follow_redirects' => TRUE
@@ -159,20 +159,4 @@ try {
 catch(HTTP_Request2_Exception $e) {
   echo 'Error: ' . $e->getMessage();
 }
-```
-
-
-```graphql
-```
-
-
-```graphql
-```
-
-
-```graphql
-```
-
-
-```graphql
 ```
