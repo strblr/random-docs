@@ -73,7 +73,29 @@ La réponse de cette requête est la suivante :
 }
 ```
 
-Cette requête peut s'exprimer via un simple `POST` dans tous les langages / framework, exemples :
+Si le mot de passe est mauvais (par exemple `tst` au lieu de `test`), la requête renverra une erreur :
+
+```json
+{
+    "data": null,
+    "errors": [
+        {
+            "message": "The password is incorrect",
+            "locations": [
+                {
+                    "line": 2,
+                    "column": 13
+                }
+            ],
+            "path": [
+                "signin"
+            ]
+        }
+    ]
+}
+```
+
+Une requête GraphQL peut s'exprimer via un simple `POST` dans tous les langages / framework. C'est le corps de la requête qui va contenir le code GraphQL. Exemples :
 
 #### NodeJS - Request
 
