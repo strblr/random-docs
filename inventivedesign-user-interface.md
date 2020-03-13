@@ -2,7 +2,7 @@ Avant d'aborder cette doc, je vous conseille de prendre une heure pour lire et v
 
 ## Schéma
 
-Voici le schéma GraphQL dans son intégralité :
+Voici la partie du schéma GraphQL qui vous intéresse :
 
 ```graphql
 type User {
