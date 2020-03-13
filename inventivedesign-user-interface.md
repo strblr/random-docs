@@ -9,12 +9,6 @@ type User {
   id: ID!
   signupDate: String!
   online: Boolean!
-  coworker: Boolean!
-  groupCount: Int!
-  invitationCount: Int!
-  coworkerCount: Int!
-  projectCount: Int!
-  actionCount: Int!
   token: String!
   email: String! 
   name: String!
@@ -42,8 +36,6 @@ type Mutation {
 - `avatar` renvoie l'avatar d'un user (sous forme d'une chaine en [base 64](https://fr.wikipedia.org/wiki/Base64)) à partir de son email (pratique pour pré-afficher un avatar sur l'écran de login quand le user tape son email)
 - `verifyUser` vérifie la validité d'un token (renvoyé en tant que champ par `signin`) : renvoie le `User` correspondant si valide, `null` si invalide.
 - `signin` renvoie une entité `User` (comprenant un champ `token`) si l'email et le password passés en paramètre sont bons.
-
-Tous les champs ne seront évidemment pas exploitables dans vos applications (`coworker`, `projectCount`, etc. sont spécifiques à Finder / Physisolve).
 
 ## Opération
 
