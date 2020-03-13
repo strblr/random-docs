@@ -1,4 +1,8 @@
-Schema :
+Avant d'aborder cette doc, je vous conseille de prendre une heure pour lire et vous familiariser avec GraphQL, dans les grandes lignes au moins. Tout est sur [le site officiel](https://graphql.org/).
+
+## Schéma
+
+Voici le schéma GraphQL dans son intégralité :
 
 ```graphql
 type User {
@@ -31,4 +35,118 @@ type Query {
 type Mutation {
   signin(email: String!, password: String!): User!
 }
+```
+
+## Opération
+
+Pour exécuter une mutation (par exemple `signin`), GraphQL utilise la syntaxe suivante :
+
+```graphql
+mutation {
+    signin(email: "test@test.fr", password: "test") {
+        id
+        online
+        name
+        job
+        website
+        token
+    }
+}
+```
+
+La réponse de cette requête est la suivante :
+
+```json
+{
+    "data": {
+        "signin": {
+            "id": "5cd0f843acf6e83cc265083b",
+            "online": false,
+            "name": "Elisabeth Ruecker",
+            "job": "Software Developer",
+            "website": "https://www.drodd.com/funny-team-names/science-team-names.html",
+            "token": "................"
+        }
+    }
+}
+```
+
+Cette requête peut s'exprimer via un simple `POST` dans tous les langages / framework, exemples :
+
+#### NodeJS - Request
+
+```javascript
+var request = require('request');
+var options = {
+  'method': 'POST',
+  'url': 'http://localhost:8084/finder/api',
+  'headers': {
+    'Content-Type': 'application/json'
+  },
+  body: JSON.stringify({
+    query: `
+        mutation {
+            signin(email: "test@test.fr", password: "test") {
+                id
+                online
+                name
+                job
+                website
+                token
+            }
+        }
+    `,
+    variables: {}
+  })
+};
+request(options, function (error, response) { 
+  if (error) throw new Error(error);
+  console.log(response.body);
+});
+```
+
+#### PHP - HTTP_Request2
+
+```php
+<?php
+require_once 'HTTP/Request2.php';
+$request = new HTTP_Request2();
+$request->setUrl('http://localhost:8084/finder/api');
+$request->setMethod(HTTP_Request2::METHOD_POST);
+$request->setConfig(array(
+  'follow_redirects' => TRUE
+));
+$request->setHeader(array(
+  'Content-Type' => 'application/json'
+));
+$request->setBody('{"query":"mutation {\\n    signin(email: \\"test@test.fr\\", password: \\"test\\") {\\n        id\\n        online\\n        name\\n        job\\n        website\\n        token\\n    }\\n}\\n","variables":{}}');
+try {
+  $response = $request->send();
+  if ($response->getStatus() == 200) {
+    echo $response->getBody();
+  }
+  else {
+    echo 'Unexpected HTTP status: ' . $response->getStatus() . ' ' .
+    $response->getReasonPhrase();
+  }
+}
+catch(HTTP_Request2_Exception $e) {
+  echo 'Error: ' . $e->getMessage();
+}
+```
+
+
+```graphql
+```
+
+
+```graphql
+```
+
+
+```graphql
+```
+
+
+```graphql
 ```
