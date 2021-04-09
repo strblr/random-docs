@@ -66,7 +66,10 @@ type Skill {
 # Here are all user-related queries :
 
 type Query {
-  user(id: ID!): User! # get user by id
+  # Get user by id :
+  user(id: ID!): User!
+
+  # Get paginated lists of users :
   users(
     organizations: [ID!] # filter by organizations
     confirmed: Boolean # filter by confirmation state
@@ -76,9 +79,13 @@ type Query {
     sortOrder: Int # you can precise the direction of that ordering
     limit: Int! # how many users per page ?
     page: Int! # what page ?
-  ): UserPage! # get paginated lists of users
-  avatar(email: String!): String # get the avatar of a user given the email
-  verifyUser(token: String!): User # decode an auth token
+  ): UserPage!
+
+  # Get the avatar of a user given the email :
+  avatar(email: String!): String
+
+  # Decode an auth token :
+  verifyUser(token: String!): User
 }
 
 # Here are all the relevant user-related mutations :
