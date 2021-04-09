@@ -1,111 +1,197 @@
-Avant d'aborder cette doc, je vous conseille de prendre une heure pour lire et vous familiariser avec GraphQL, dans les grandes lignes au moins. Tout est sur [le site officiel](https://graphql.org/).
+# User doc - Inventive Design
 
-## Schéma
+Before reading this doc, I suggest to familiarize yourself a bit with GraphQL. Everything's on [their official website](https://graphql.org/).
 
-Voici la partie du schéma GraphQL qui vous intéresse :
+## Schema
+
+Here the part of the GraphQL schema that's of interest when handling users :
 
 ```graphql
+# This type represents a user :
+
 type User {
-  id: ID!
+  id: ID! # unique id
   signupDate: String!
   online: Boolean!
-  token: String!
-  email: String! 
+  coworker: Boolean! # is the user a corworker of the user making the request ?
+  coworkerCount: Int! # total number of coworkers
+  sessionCount: Int! # total number of sessions the user's involved in
+  teamCount: Int! # total number of teams the user's involved in
+  projectCount: Int! # total number of projects the user's involved in
+  invitationCount: Int! # total number of pending invitations for that user
+  token: String! # auth token ; /!\ this is only available on User returned by verifyUser and signin /!\
+  email: String!
+  state: UserState! # see "enum UserState"
+  status: UserStatus! # see "enum UserStatus"
   name: String!
-  job: String! 
-  website: String! 
-  bio: String! 
+  job: String!
+  organizations: [Organization!]!
+  website: String!
+  skills: [Skill!]! # see "type Skill"
+  bio: String!
   avatar: String
   lastOnline: String!
 }
 
-type Query {
-  user(id: ID!): User!
-  userCount: Int!
-  avatar(email: String!): String
-  verifyUser(token: String!): User
+# This type is used to return paginated lists of users :
+
+type UserPage {
+  total: Int!
+  items: [User!]!
 }
 
+# This enum identifies the account state of the user :
+
+enum UserState {
+  INVITED
+  UNCONFIRMED
+  ACTIVE
+  BANNED
+  DEACTIVATED
+}
+
+# This enum identifies the role of the user :
+
+enum UserStatus {
+  ADMIN
+  MANAGER
+  MEMBER
+}
+
+type Skill {
+  name: String!
+  rate: Int!
+}
+
+# Here are all user-related queries :
+
+type Query {
+  user(id: ID!): User! # get user by id
+  users(
+    organizations: [ID!] # filter by organizations
+    confirmed: Boolean # filter by confirmation state
+    online: Boolean # filter by current presence
+    search: String # filter by text
+    sort: String # you can order the list according to a specific field
+    sortOrder: Int # you can precise the direction of that ordering
+    limit: Int! # how many users per page ?
+    page: Int! # what page ?
+  ): UserPage! # get paginated lists of users
+  avatar(email: String!): String # get the avatar of a user given the email
+  verifyUser(token: String!): User # decode an auth token
+}
+
+# Here are all the relevant user-related mutations :
+
 type Mutation {
+  # The signin mutation (if successful, returns a User with a "token" field) :
   signin(email: String!, password: String!): User!
+
+  # Invite users by email (rejected if not admin or manager) :
+  inviteUsers(emails: [String!]!, organizations: [ID!]!): [User!]!
+
+  # Reinvite a user by id (rejected if not admin or manager) :
+  reinviteUser(id: ID!): User!
+
+  # Send a password recovery email :
+  recoverPassword(email: String!): Boolean!
+
+  # Confirm the signup of a user (rejected if not admin) :
+  confirmUser(id: ID!): User!
+
+  # Edit a user's profile :
+  editUser(
+    id: ID!
+    email: String!
+    status: UserStatus!
+    oldPassword: String!
+    password: String!
+    name: String!
+    job: String!
+    organizations: [ID!]!
+    website: String!
+    skills: [SkillInput!]!
+    bio: String!
+    avatar: String
+  ): User!
+
+  # Ban a user (rejected if not admin) :
+  banUser(id: ID!): User!
+
+  # Deactive a user's account (rejected if not done by the targeted user) :
+  deactivateUser(id: ID!): User!
 }
 ```
 
-- `user` renvoie une entité `User` à partir de son id
-- `userCount` renvoie le nombre d'utilisateurs inscrits en tout
-- `avatar` renvoie l'avatar d'un user (sous forme d'une chaine en [base 64](https://fr.wikipedia.org/wiki/Base64)) à partir de son email (pratique pour pré-afficher un avatar sur l'écran de login quand le user tape son email)
-- `verifyUser` vérifie la validité d'un token (renvoyé en tant que champ par `signin`) : renvoie le `User` correspondant si valide, `null` si invalide.
-- `signin` renvoie une entité `User` (comprenant un champ `token`) si l'email et le password passés en paramètre sont bons.
+- Signups have to happen on the inventivedesign ecosystem apps
 
 ## Opération
 
-Pour exécuter une mutation (par exemple `signin`), GraphQL utilise la syntaxe suivante :
+To execute a mutation (for example "signin"), GraphQL uses the following syntax :
 
 ```graphql
 mutation {
-    signin(email: "test@test.fr", password: "test") {
-        id
-        online
-        name
-        job
-        website
-        token
-    }
+  signin(email: "test@test.fr", password: "test") {
+    id
+    online
+    name
+    job
+    website
+    token
+  }
 }
 ```
 
-La réponse de cette requête est la suivante :
+If successful, the response will look like :
 
 ```json
 {
-    "data": {
-        "signin": {
-            "id": "5cd0f843acf6e83cc265083b",
-            "online": false,
-            "name": "Elisabeth Ruecker",
-            "job": "Software Developer",
-            "website": "https://www.drodd.com/funny-team-names/science-team-names.html",
-            "token": "................"
-        }
+  "data": {
+    "signin": {
+      "id": "5cd0f843acf6e83cc265083b",
+      "online": false,
+      "name": "Elisabeth Ruecker",
+      "job": "Software Developer",
+      "website": "https://www.drodd.com/funny-team-names/science-team-names.html",
+      "token": "................"
     }
+  }
 }
 ```
 
-Si le mot de passe est mauvais (par exemple `tst` au lieu de `test`), la requête renverra une erreur :
+If there's an error, for example a bad password, the request will return the following error :
 
 ```json
 {
-    "data": null,
-    "errors": [
+  "data": null,
+  "errors": [
+    {
+      "message": "The password is incorrect",
+      "locations": [
         {
-            "message": "The password is incorrect",
-            "locations": [
-                {
-                    "line": 2,
-                    "column": 13
-                }
-            ],
-            "path": [
-                "signin"
-            ]
+          "line": 2,
+          "column": 13
         }
-    ]
+      ],
+      "path": ["signin"]
+    }
+  ]
 }
 ```
 
 ## Frameworks
 
-Une requête GraphQL peut s'exprimer via un simple `POST` dans tous les langages / framework. C'est le corps de la requête qui va contenir le code GraphQL. Exemples :
+A GraphQL request can be expressed via a simple "POST" http request in all languages / frameworks. The body of the request will contain the actual GraphQL code. Examples :
 
 #### NodeJS - Request
 
 ```javascript
-var request = require('request');
+var request = require("request");
 var options = {
-  'method': 'POST',
-  'url': 'monUrl',
-  'headers': {
-    'Content-Type': 'application/json'
+  method: "POST",
+  url: "monUrl",
+  headers: {
+    "Content-Type": "application/json"
   },
   body: JSON.stringify({
     query: `
@@ -123,7 +209,7 @@ var options = {
     variables: {}
   })
 };
-request(options, function (error, response) { 
+request(options, function(error, response) {
   if (error) throw new Error(error);
   console.log(response.body);
 });
