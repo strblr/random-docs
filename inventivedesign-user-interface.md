@@ -63,6 +63,11 @@ type Skill {
   rate: Int!
 }
 
+input SkillInput {
+  name: String!
+  rate: Int!
+}
+
 # Here are all user-related queries :
 
 type Query {
@@ -132,7 +137,7 @@ type Mutation {
 
 - Signups have to happen on the inventivedesign ecosystem apps
 
-## Opération
+## Operation
 
 To execute a mutation (for example "signin"), GraphQL uses the following syntax :
 
