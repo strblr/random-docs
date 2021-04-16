@@ -13,6 +13,7 @@ type User {
   id: ID! # unique id
   signupDate: String!
   online: Boolean!
+  mailto: String # "mailto" string for anchors
   coworker: Boolean! # is the user a corworker of the user making the request ?
   coworkerCount: Int! # total number of coworkers
   sessionCount: Int! # total number of sessions the user's involved in
